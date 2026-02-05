@@ -5,6 +5,7 @@ Anime Vanguards: Music Note Macro (Open Source)
 Display Resolution: 1920 x 1080
 Windows Scale: 100%
 <img width="617" height="179" alt="image" src="https://github.com/user-attachments/assets/c089d556-234f-426b-ac9a-9f6a8a09378d" />
+
 In-game Hotkeys: A, S, D, F, G
 <img width="1097" height="214" alt="image" src="https://github.com/user-attachments/assets/fc898bed-4328-4dc8-b957-f6c1e994b18f" />
 In-game Graphics: ปรับต่ำสุด (Low Settings) เพื่อให้ค่าสีคงที่
