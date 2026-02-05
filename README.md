@@ -1,4 +1,7 @@
 Anime Vanguards: Music Note Macro (Open Source)	
+
+<img width="362" height="163" alt="image" src="https://github.com/user-attachments/assets/39233256-b2ff-4d96-b55a-97a0719f5137" />
+
 แจกสคริปต์มาโครสำหรับกดโน๊ตเพลงในแมพ Anime Vanguards ครับ	
 ตัวนี้ผมพัฒนาขึ้นมาเพื่อเป็นการศึกษา สำหรับใครที่ต้องการนำไปพัฒนาต่อยอด หรือปรับปรุงระบบให้ดียิ่งขึ้นสามารถนำไปใช้ได้เลยครับ!
 
