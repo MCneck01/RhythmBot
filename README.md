@@ -6,7 +6,9 @@ Anime Vanguards: Music Note Macro (Open Source)
 
 ⚙️ การตั้งค่าที่จำเป็น (Prerequisites)
 เพื่อให้มาโครทำงานได้อย่างแม่นยำ โปรดตั้งค่าเครื่องดังนี้:
+
 Display Resolution: 1920 x 1080
+
 Windows Scale: 100%
 
 <img width="617" height="179" alt="image" src="https://github.com/user-attachments/assets/c089d556-234f-426b-ac9a-9f6a8a09378d" />
