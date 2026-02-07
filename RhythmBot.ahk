@@ -1,89 +1,94 @@
-﻿#NoEnv
+#NoEnv
 #SingleInstance Force
+#MaxHotkeysPerInterval 99000000
+#HotkeyInterval 99000000
+#KeyHistory 0
 SetBatchLines, -1
+Process, Priority, , High
+ListLines, Off
+SendMode Input
+SetTitleMatchMode 2
+SetKeyDelay, -1, -1
 CoordMode, Pixel, Screen
 CoordMode, Mouse, Screen
-SetKeyDelay, -1, -1
 
-; --- UI (ลากได้ / Always on Top / ปิดสนิท) ---
-Gui, +AlwaysOnTop -Caption +Border
+; --- UI Setup ---
+; ลบ E0x08000000 ออก เพื่อให้คลิกแล้วเลือกหน้าต่างได้
+Gui, +AlwaysOnTop -Caption +Border +LastFound
 Gui, Color, 050505
 Gui, Font, s12 w700 c00FFFF, Segoe UI
-Gui, Add, Text, x10 y10 w330 Center, RHYTHM v1.3 (beta by.sasaya)
 
-; --- ส่วนควบคุมด้านซ้าย ---
+; เก็บ ID ของหน้าต่างบอทไว้ เพื่อสั่งลากตัวมันเองโดยเฉพาะ
+WinGet, hGui, ID
+
+; แถบหัวข้อสำหรับลาก (Drag Bar)
+Gui, Add, Text, x0 y0 w360 h40 Center gDragBackground +0x200 Background000000, RHYTHM PRO v1.4 (beta by.sasaya)
+
 Gui, Font, s10 w400 cWhite
-Gui, Add, Text, x20 y50, [F2] START BOT
-Gui, Add, Text, x20 y80, [F3] RELOAD / STOP
-Gui, Add, Text, x20 y110, [F4] CLOSE APP
+Gui, Add, Text, x20 y50 gDragBackground, [F2] START / STOP
+Gui, Add, Text, x20 y80 gDragBackground, [F3] RELOAD
+Gui, Add, Text, x20 y110 gDragBackground, [F4] CLOSE
 
-; --- GroupBox สถานะ ---
-Gui, Add, GroupBox, x160 y45 w180 h85 c00FFFF, Status ; *ขยายความสูงเล็กน้อย*
-
-; ข้อความ ONLINE/OFFLINE
+Gui, Add, GroupBox, x160 y45 w180 h85 c00FFFF, Status
 Gui, Font, s14 w700
-Gui, Add, Text, x170 y65 w160 Center vStatus cRed, OFFLINE
+Gui, Add, Text, x170 y75 w160 Center vStatus cRed gDragBackground, OFFLINE
 
-; --- ไฟสถานะ (LEDs) ---
-; ใช้ Progress bar เต็มหลอด (100) เพื่อจำลองเป็นไฟ
-; ตั้งชื่อตัวแปรเป็น LightA, LightS... เพื่อเรียกใช้ในฟังก์ชัน
-Gui, Add, Progress, x170 y95 w28 h10 vLightA c333333 Background101010, 100
-Gui, Add, Progress, x+5 yp w28 h10 vLightS c333333 Background101010, 100
-Gui, Add, Progress, x+5 yp w28 h10 vLightD c333333 Background101010, 100
-Gui, Add, Progress, x+5 yp w28 h10 vLightF c333333 Background101010, 100
-Gui, Add, Progress, x+5 yp w28 h10 vLightG c333333 Background101010, 100
+Gui, Show, w360 h150, RhythmBotPro
 
-Gui, Show, w360 h160, RhythmBotPro
-
+; --- ระบบลากหน้าจอแบบระบุตัวตน (Targeted Drag) ---
 OnMessage(0x0201, "WM_LBUTTONDOWN")
 return
 
+DragBackground:
+    PostMessage, 0xA1, 2,,, ahk_id %hGui%
+return
+
 WM_LBUTTONDOWN() {
-    PostMessage, 0xA1, 2,,, A
+    global hGui
+    PostMessage, 0xA1, 2,,, ahk_id %hGui%
 }
 
 ; --- ปุ่มควบคุม ---
 F4:: ExitApp 
 F3:: Reload
 
+global BotRunning := false
+
 F2::
-GuiControl, +c00FF00, Status
-GuiControl,, Status, ONLINE
-Loop {
-    ; ส่ง KeyName และ Color ไปด้วย เพื่อเอาไปเปลี่ยนสีไฟ
-    HandleKey("a", 780, 820, 802, 865, 0x9800FE) ; เลน A (ม่วง)
-    HandleKey("s", 866, 820, 888, 865, 0xE9008C) ; เลน S (ชมพู)
-    HandleKey("d", 948, 820, 970, 865, 0x0091F2) ; เลน D (ฟ้า)
-    HandleKey("f", 1032, 820, 1054, 865, 0x00F694) ; เลน F (เขียว)
-    HandleKey("g", 1117, 820, 1139, 865, 0xF69400) ; เลน G (ส้ม)
+    BotRunning := !BotRunning
     
-    if GetKeyState("F3")
-        break
-}
+    if (BotRunning) {
+        GuiControl, +c00FF00, Status
+        GuiControl,, Status, ONLINE
+        SetTimer, RunBotLogic, 0 ; ใช้ Timer แทน Loop เพื่อไม่ให้ UI ค้าง
+    } else {
+        GuiControl, +cRed, Status
+        GuiControl,, Status, OFFLINE
+        SetTimer, RunBotLogic, Off
+    }
 return
 
-; --- ฟังก์ชันประมวลผล (เพิ่มการเปลี่ยนสีไฟ UI) ---
+; --- ลอจิกบอท ---
+RunBotLogic:
+    ; *** ใส่ค่าพิกัดที่คุณหามาได้ ตรงนี้ ***
+    HandleKey("a", 780, 848, 802, 852, 0x9800FE)
+    HandleKey("s", 866, 848, 888, 852, 0xE9008C)
+    HandleKey("d", 948, 848, 970, 852, 0x0091F2)
+    HandleKey("f", 1032, 848, 1054, 852, 0x00F694)
+    HandleKey("g", 1117, 848, 1139, 852, 0xF69400)
+return
+
 HandleKey(keyName, x1, y1, x2, y2, color) {
-    ; Variation 75
-    PixelSearch, Px, Py, x1, y1, x2, y2, color, 75, Fast RGB
-    
+    PixelSearch, Px, Py, x1, y1, x2, y2, color, 65, Fast RGB
+    isPressed := GetKeyState(keyName)
+
     if (ErrorLevel = 0) {
-        if !GetKeyState(keyName) {
-            Send {%keyName% down}
-            ; [UI] เปิดไฟ: เปลี่ยนสี Progress bar เป็นสีเดียวกับโน้ต
-            ; ตัด 0x ออกจากสีเพื่อให้ GuiControl อ่านค่าได้ถูกต้อง (แม้ AHK จะฉลาดพอ แต่ทำเพื่อความชัวร์)
-            cleanColor := RegExReplace(color, "^0x", "")
-            GuiControl, +c%cleanColor%, Light%keyName%
+        if (!isPressed) {
+            Send {Blind}{%keyName% down}
         }
     } else {
-        if GetKeyState(keyName) {
-            Sleep, 25
-            PixelSearch, Px, Py, x1, y1, x2, y2, color, 75, Fast RGB
-            if (ErrorLevel != 0) {
-                Send {%keyName% up}
-                ; [UI] ปิดไฟ: เปลี่ยนกลับเป็นสีเทาเข้ม
-                GuiControl, +c333333, Light%keyName%
-            }
+        if (isPressed) {
+            Send {Blind}{%keyName% up}
         }
     }
 }
